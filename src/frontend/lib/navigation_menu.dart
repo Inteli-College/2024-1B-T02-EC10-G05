@@ -1,14 +1,16 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/views/nursery/home.dart';
+import 'package:frontend/views/nursery/my_requests.dart';
 import 'package:get/get.dart';
 
 class NavigationMenu extends StatelessWidget {
-  const NavigationMenu({super.key});
+  final String userToken;
+
+  const NavigationMenu({Key? key, required this.userToken}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(NavigationController());
+    final controller = Get.put(NavigationController(userToken: userToken));
 
     return Scaffold(
       bottomNavigationBar: Obx(
@@ -26,9 +28,16 @@ class NavigationMenu extends StatelessWidget {
   }
 }
 
-
-class NavigationController extends GetxController{
+class NavigationController extends GetxController {
+  final String userToken;
   final Rx<int> selectedIndex = 0.obs;
 
-  final screens = [ HomeNursery(), Container(color: Colors.purple,) ];
+  late final List<Widget> screens;
+
+  NavigationController({required this.userToken}) {
+    screens = [
+      HomeNursery(),
+      MyRequests(userToken: userToken),
+    ];
+  }
 }

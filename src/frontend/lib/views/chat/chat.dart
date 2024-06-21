@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
@@ -9,24 +8,15 @@ import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) => const MaterialApp(
-        home: Directionality(
-          textDirection: TextDirection.ltr,
-          child: ChatPage(),
-        ),
-      );
-}
-
 class ChatPage extends StatefulWidget {
-  const ChatPage({super.key});
+  final String userToken;
+  final int requestId;
+
+  const ChatPage({
+    super.key,
+    required this.userToken,
+    required this.requestId,
+  });
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -34,22 +24,20 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   List<types.Message> _messages = [];
-  final String _userToken = 'paulo';
   late final types.User _user;
-  final int request = 1;
   late WebSocketChannel _channel;
   final AutoScrollController _scrollController = AutoScrollController();
 
   @override
   void initState() {
     super.initState();
-    _user = types.User(id: _userToken == 'admin' ? 'admin-id' : '82091008-a484-4a89-ae75-a22bf8d6f3ac');
+    _user = types.User(id: widget.userToken == 'admin' ? 'admin-id' : '82091008-a484-4a89-ae75-a22bf8d6f3ac');
     _loadMessages();
     _connectWebSocket();
   }
 
   void _connectWebSocket() {
-    final token = _userToken;
+    final token = widget.userToken;
     final url = 'wss://pilltrackr.cathena.io/ws/?token=$token';
 
     try {
@@ -61,11 +49,9 @@ class _ChatPageState extends State<ChatPage> {
         _handleIncomingMessage(decodedMessage);
       }, onError: (error) {
         print('WebSocket error: $error');
-        // Tentar reconectar após um tempo
         Future.delayed(Duration(seconds: 20), () => _connectWebSocket());
       }, onDone: () {
         print('WebSocket closed');
-        // Tentar reconectar após um tempo
         Future.delayed(Duration(seconds: 10), () => _connectWebSocket());
       });
     } catch (e) {
@@ -75,7 +61,7 @@ class _ChatPageState extends State<ChatPage> {
 
   void _handleIncomingMessage(Map<String, dynamic> message) {
     final messageData = message['message'];
-    if (messageData['RequestID'] == request) {
+    if (messageData['RequestID'] == widget.requestId) {
       final isSentByUser = messageData['SentByUser'] ?? false;
       final author = types.User(id: isSentByUser ? _user.id : 'admin-id');
 
@@ -96,7 +82,6 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-
   void _handleSendPressed(types.PartialText message) {
     final textMessage = types.TextMessage(
       author: _user,
@@ -108,7 +93,7 @@ class _ChatPageState extends State<ChatPage> {
     _addMessage(textMessage);
 
     final wsMessage = {
-      "request": request,
+      "request": widget.requestId,
       "content": message.text,
     };
     _channel.sink.add(json.encode(wsMessage));
@@ -116,7 +101,7 @@ class _ChatPageState extends State<ChatPage> {
 
   void _loadMessages() async {
     final response = await http.get(
-      Uri.parse('https://pilltrackr.cathena.io/api/request/$request/messages'),
+      Uri.parse('https://pilltrackr.cathena.io/api/request/${widget.requestId}/messages'),
       headers: {
         'Authorization': 'Bearer admin',
       },
@@ -137,7 +122,7 @@ class _ChatPageState extends State<ChatPage> {
       }).toList();
 
       setState(() {
-        _messages = messages.reversed.toList(); // Inverter a lista de mensagens
+        _messages = messages.reversed.toList();
       });
     } else {
       print('Failed to load messages');

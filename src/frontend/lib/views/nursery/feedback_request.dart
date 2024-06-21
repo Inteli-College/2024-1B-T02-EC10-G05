@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/views/nursery/home.dart';
 import 'package:frontend/views/nursery/my_requests.dart';
 
 class FeedbackRequest extends StatelessWidget {
   final String requestId;
-  final String pyxisLocation;
+  final List<String> medicinesList;
 
-  FeedbackRequest({required this.requestId, required this.pyxisLocation});
+  FeedbackRequest({required this.requestId, required this.medicinesList});
 
   @override
   Widget build(BuildContext context) {
@@ -14,17 +13,9 @@ class FeedbackRequest extends StatelessWidget {
       backgroundColor: Color(0xFFECF0F3),
       appBar: AppBar(
         backgroundColor: Color(0xFFECF0F3),
-        title: const Text(
-          'Sucesso!',
-          style: TextStyle(
-            fontSize: 36,
-            fontWeight: FontWeight.bold,
-            color: Colors.green,
-          ),
-        ),
         automaticallyImplyLeading: false,
+        toolbarHeight: 100.0, // Ajusta a altura da AppBar para acomodar o padding
       ),
-
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -40,34 +31,41 @@ class FeedbackRequest extends StatelessWidget {
                   color: Colors.black,
                 ),
                 children: <TextSpan>[
-                  TextSpan(text: 'Requisição $requestId ', style: const TextStyle(color: Colors.purple,)),
-                  TextSpan(text: 'foi feita com sucesso!', style: TextStyle(color: Colors.black,)),
+                  TextSpan(
+                      text: 'Requisição $requestId ',
+                      style: const TextStyle(color: Colors.green)),
+                  TextSpan(
+                      text: 'foi feita com sucesso!',
+                      style: TextStyle(color: Colors.black)),
                 ],
               ),
             ),
             const SizedBox(height: 30),
-
-            RichText(
-              text: TextSpan(
-                text: 'Pyxis mais próximo com os medicamentos:  ',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-                children: <TextSpan>[
-                  TextSpan(text: '\n$pyxisLocation ', style: const TextStyle(color: Colors.purple,)),
-                ],
+            const Text(
+              'Mat/Med adicionados:',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
               ),
             ),
+            const SizedBox(height: 10),
+            ...medicinesList.map((medicine) => Text(
+                  '- $medicine',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.black,
+                  ),
+                )).toList(),
             const SizedBox(height: 70),
-
             Center(
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => MyRequests()),
+                    MaterialPageRoute(
+                      builder: (context) => MyRequests(userToken: userToken),
+                    ),
                   );
                 },
                 style: ElevatedButton.styleFrom(

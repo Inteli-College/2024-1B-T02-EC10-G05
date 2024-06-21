@@ -9,7 +9,7 @@ final dio = Dio(
       HttpHeaders.authorizationHeader: 'amanda',
       HttpHeaders.contentTypeHeader: 'application/json',
     },
-    connectTimeout: const Duration(seconds: 3),
+    connectTimeout: const Duration(seconds: 5),
   ),
 );  
 

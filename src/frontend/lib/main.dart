@@ -5,6 +5,7 @@ import 'package:frontend/views/nursery/feedback_request.dart';
 import 'package:frontend/views/nursery/home.dart';
 import 'package:frontend/views/nursery/other_request.dart';
 import 'package:frontend/views/chat/chat.dart';
+import 'package:frontend/views/pharmacy/central/pending_requests.dart';
 
 void main() {
   runApp(MyApp());
@@ -13,6 +14,8 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final String userToken = 'paulo';
+
     return MaterialApp(
       title: 'Pilltrackr',
       theme: ThemeData(
@@ -20,7 +23,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/chat',
+      initialRoute: '/',
       onGenerateRoute: (settings) {
         switch (settings.name) {
           case '/feedbackRequest':
@@ -29,32 +32,20 @@ class MyApp extends StatelessWidget {
               builder: (context) {
                 return FeedbackRequest(
                   requestId: args['requestId'],
-                  pyxisLocation: args['pyxisLocation'],
+                  medicinesList: args['medicinesList'],
                 );
               },
             );
-    // Exemplo de outra rota sendo passada com parametros
-    //      
-          // case '/detail':
-          //   final args = settings.arguments as Map<String, dynamic>;
-          //   return MaterialPageRoute(
-          //     builder: (context) {
-          //       return DetailScreen(
-          //         itemId: args['itemId'],
-          //         itemName: args['itemName'],
-          //       );
-          //     },
-          //   );
           default:
             return null; // Return null to use default `onUnknownRoute`
         }
       },
       routes: {
-        '/': (context) => NavigationMenu(),
+        '/': (context) => NavigationMenu(userToken: userToken),
         '/otherRequest': (context) => OtherRequest(),
         // '/newRequests': (context) => NewRequest(),
         // '/myRequests': (context) => MyRequests(),
-        '/chat': (context) => const ChatPage(),
+        '/pendentes': (context) => PendingRequests()
       },
     );
   }
