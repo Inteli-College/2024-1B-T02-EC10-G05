@@ -53,3 +53,15 @@ Ao longo da quarta sprint, a equipe de desenvolvimento se dedicou à integraçã
     style={{ display: 'block', margin: 'auto', width: '100%', height: '66vh' }}
     src="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAGHc_godcc&#x2F;e-QOWBVCs2wsGxS6eNUudg&#x2F;view?embed" >
 </iframe>
+
+## Sprint V
+
+A quinta sprint foi focada na finalização da solução, incluindo a implementação de ajustes finais, testes extensivos e a documentação detalhada do projeto. A equipe também desenvolveu um plano de comunicação para garantir que os colaboradores do Hospital Sírio-Libanês sejam devidamente informados e treinados sobre o uso da nova plataforma. A apresentação da Sprint V incluiu uma visão geral das funcionalidades implementadas, os testes realizados e os próximos passos para a implementação completa da solução.
+
+[Link da Apresentação](https://www.canva.com/design/DAGIrMo65sY/gBCPR4XDCUTEWM-oaxiMmw/edit?utm_content=DAGIrMo65sY&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+
+
+<iframe loading="lazy"
+    style={{ display: 'block', margin: 'auto', width: '100%', height: '66vh' }}
+    src="https://www.canva.com/design/DAGIrMo65sY/gBCPR4XDCUTEWM-oaxiMmw/view?embed" >
+</iframe>

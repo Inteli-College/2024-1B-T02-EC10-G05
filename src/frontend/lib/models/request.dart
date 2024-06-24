@@ -11,7 +11,6 @@ class Request {
   final String? messages;
   final String? productName;
   final String? productCode;
-
   
 
   Request({

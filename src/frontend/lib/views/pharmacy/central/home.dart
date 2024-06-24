@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:frontend/views/nursery/medicine_request.dart';
 import 'package:frontend/views/nursery/other_request.dart';
 
-class HomeNursery extends StatefulWidget {
+class HomePharmacy extends StatefulWidget {
   @override
-  _HomeNurseryState createState() => _HomeNurseryState();
+  _HomePharmacyState createState() => _HomePharmacyState();
 }
 
-class _HomeNurseryState extends State<HomeNursery> {
-  String selectedOption = 'Mat/Med';
+class _HomePharmacyState extends State<HomePharmacy> {
+  String selectedOption = 'Medicamentos';
 
   @override
   Widget build(BuildContext context) {
@@ -50,10 +50,10 @@ class _HomeNurseryState extends State<HomeNursery> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(25.0), // Bordas mais circulares
                   child: ToggleButtons(
-                    isSelected: [selectedOption == 'Mat/Med', selectedOption == 'Outros'],
+                    isSelected: [selectedOption == 'Medicamentos', selectedOption == 'Outros'],
                     onPressed: (int index) {
                       setState(() {
-                        selectedOption = index == 0 ? 'Mat/Med' : 'Outros';
+                        selectedOption = index == 0 ? 'Medicamentos' : 'Outros';
                       });
                     },
                     borderColor: Colors.transparent,
@@ -63,7 +63,7 @@ class _HomeNurseryState extends State<HomeNursery> {
                     selectedColor: Colors.white,
                     constraints: BoxConstraints(minHeight: 70.0, minWidth: 150.0),
                     children: const [
-                      Text('Mat/Med'),
+                      Text('Medicamentos'),
                       Text('Outros'),
                     ],
                   ),
@@ -80,7 +80,7 @@ class _HomeNurseryState extends State<HomeNursery> {
                       MaterialPageRoute(builder: (context) => OtherRequest()),
                     );
                   } 
-                  else if (selectedOption == 'Mat/Med') {
+                  else if (selectedOption == 'Medicamentos') {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => MedicineRequest()), // Navega para NewRequest

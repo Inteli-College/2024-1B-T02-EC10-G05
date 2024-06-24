@@ -1,14 +1,16 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import '../../services/request_service.dart';
 import '../../widgets/list_tile_nursery.dart';
 
 class MyRequests extends StatefulWidget {
-  final String userToken;
+  // final String userToken;
 
   const MyRequests({
     Key? key,
-    required this.userToken,
+    // required this.userToken,
   }) : super(key: key);
 
   @override
@@ -34,6 +36,9 @@ class _MyRequestsState extends State<MyRequests> {
       print('Erro ao buscar requisições: $e');
     }
   }
+
+  final _random = new Random();
+  var statusList = ['Aguardando Aprovação','Aprovado','Rejeitado'];
 
   @override
   Widget build(BuildContext context) {
@@ -61,12 +66,14 @@ class _MyRequestsState extends State<MyRequests> {
                   var productNames = (request['Products'] as List<dynamic>)
                       .map((product) => product['Name'] as String)
                       .join(', ');
+                  var element = statusList[_random.nextInt(statusList.length)];
+
                   return ListTileNursery(
                     title: 'Requisição #${request['ID']}',
                     subtitle: '$productNames - ${request['IsUrgent']}',
                     item: productNames,
-                    userToken: widget.userToken,
                     requestId: request['ID'],
+                    // isImmediate: request['IsUrgent'],
                   );
                 },
               ),

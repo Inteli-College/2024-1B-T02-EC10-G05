@@ -5,6 +5,7 @@ import 'package:frontend/views/nursery/feedback_request.dart';
 import 'package:frontend/views/nursery/home.dart';
 import 'package:frontend/views/nursery/other_request.dart';
 import 'package:frontend/views/chat/chat.dart';
+import 'package:frontend/views/pharmacy/central/pending_requests.dart';
 
 void main() {
   runApp(MyApp());
@@ -31,18 +32,7 @@ class MyApp extends StatelessWidget {
               builder: (context) {
                 return FeedbackRequest(
                   requestId: args['requestId'],
-                  pyxisLocation: args['pyxisLocation'],
-                  userToken: args['userToken'],
-                );
-              },
-            );
-          case '/chat':
-            final args = settings.arguments as Map<String, dynamic>;
-            return MaterialPageRoute(
-              builder: (context) {
-                return ChatPage(
-                  requestId: args['requestId'],
-                  userToken: args['userToken'],
+                  medicinesList: args['medicinesList'],
                 );
               },
             );
@@ -55,6 +45,7 @@ class MyApp extends StatelessWidget {
         '/otherRequest': (context) => OtherRequest(),
         // '/newRequests': (context) => NewRequest(),
         // '/myRequests': (context) => MyRequests(),
+        '/pendentes': (context) => PendingRequests()
       },
     );
   }

@@ -6,7 +6,7 @@ class ListTileNursery extends StatefulWidget {
   final String title;
   final String subtitle;
   final String item;
-  final String userToken;
+  // final String userToken;
   final int requestId;
 
   const ListTileNursery({
@@ -14,7 +14,7 @@ class ListTileNursery extends StatefulWidget {
     required this.title,
     required this.subtitle,
     required this.item,
-    required this.userToken,
+    // required this.userToken,
     required this.requestId,
   });
 
@@ -73,7 +73,8 @@ class _ListTileNurseryState extends State<ListTileNursery> {
                   MaterialPageRoute(
                     builder: (context) => ChatPage(
                       requestId: widget.requestId,
-                      userToken: widget.userToken,
+                      userToken: 'amanda',
+                      // userToken: widget.userToken,
                     ),
                   ),
                 );
