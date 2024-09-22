@@ -4,20 +4,25 @@ import (
 	"fmt"
 	"g5/server/db"
 	"g5/server/types"
-	"log"
-	// "math"
-
 	"github.com/gin-gonic/gin"
+	"log"
 )
 
 func CreateRequest(
 	c *gin.Context,
 	clients types.Clients,
-	productCodes []string,
+	userInternalId string,
+	productCodes []uint,
 	isUrgent bool,
 	description string,
-	// pixiesID uint,
+	PyxisID uint,
 ) {
+	fmt.Println("Request received:", productCodes, isUrgent, description, PyxisID)
+	fmt.Println("ProductCodes:", productCodes)
+	fmt.Println("IsUrgent:", isUrgent)
+	fmt.Println("Description:", description)
+	fmt.Println("PixiesID:", PyxisID)
+	fmt.Println("User:", userInternalId)
 
 	if len(productCodes) == 0 && description == "" {
 		c.JSON(400, gin.H{"error": "Pedido vazio. Adicione pelo menos a descrição ou um produto"})
@@ -25,10 +30,21 @@ func CreateRequest(
 	}
 
 	var user db.User
-	if err := clients.Pg.Where("internal_id = ?", c.GetString("user_internal_id")).First(&user).Error; err != nil {
+	if err := clients.Pg.Where("internal_id = ?", userInternalId).First(&user).Error; err != nil {
 		c.JSON(500, gin.H{"error": "Usuário não encontrado (Isso não deveria acontecer)"})
 		return
 	}
+
+	newRequest := db.Request{
+		UserId:   user.ID,
+		IsUrgent: isUrgent,
+		PyxisID:  PyxisID,
+	}
+
+	if description != "" {
+		newRequest.Description = description
+	}
+
 
 	var products []db.Product
 	if err := clients.Pg.Where("code IN ?", productCodes).Find(&products).Error; err != nil {
@@ -37,18 +53,11 @@ func CreateRequest(
 	}
 
 	if len(products) != len(productCodes) {
-		c.JSON(500, gin.H{"message": "failed to find products"})
+		c.JSON(400, gin.H{"message": "Não foi possível encontrar todos os produtos. Verifique os códigos e tente novamente."})
 		return
 	}
 
-	// Criar um novo Request para o usuário
-	newRequest := db.Request{
-		UserId:      user.ID,
-		Description: description,
-		IsUrgent:    isUrgent,
-		Products:    products,
-		// PixiesId:    pixiesID,
-	}
+	newRequest.Products = products
 
 	// Salvar o novo Request no banco de dados
 	if err := clients.Pg.Create(&newRequest).Error; err != nil {
@@ -56,8 +65,8 @@ func CreateRequest(
 		c.JSON(500, gin.H{"error": "Erro ao criar o novo pedido"})
 	}
 
-	fmt.Println("Novo pedido criado com sucesso:", newRequest)
-	c.JSON(201, gin.H{"message": "Pedido criado com sucesso", "request": newRequest.ID})
+	fmt.Println("Novo pedido criado com sucesso")
+	c.JSON(201, gin.H{"message": "Pedido criado com sucesso", "request": newRequest})
 }
 
 func GetUserRequests(c *gin.Context, clients types.Clients) {
@@ -106,6 +115,7 @@ func GetAllMessages(c *gin.Context, clients types.Clients, id string) {
 
 	c.JSON(200, messages)
 }
+
 // func FindNearestPixies(c *gin.Context, clients types.Clients, productCode string, currentPixiesName string) {
 // 	var product db.Product
 // 	if err := clients.Pg.Where("code = ?", productCode).First(&product).Error; err != nil {

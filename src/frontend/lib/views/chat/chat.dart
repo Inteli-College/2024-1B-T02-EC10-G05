@@ -1,37 +1,22 @@
 import 'dart:convert';
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
-import 'package:intl/date_symbol_data_local.dart';
-import 'package:mime/mime.dart';
-import 'package:open_filex/open_filex.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
-
-void main() {
-  initializeDateFormatting().then((_) => runApp(const MyApp()));
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) => const MaterialApp(
-        home: Directionality(
-          textDirection: TextDirection.ltr,
-          child: ChatPage(),
-        ),
-      );
-}
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({super.key});
+  final String userToken;
+  final int requestId;
+
+  const ChatPage({
+    super.key,
+    required this.userToken,
+    required this.requestId,
+  });
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -39,167 +24,61 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   List<types.Message> _messages = [];
-  final _user = const types.User(
-    id: '82091008-a484-4a89-ae75-a22bf8d6f3ac',
-  );
+  late final types.User _user;
+  late WebSocketChannel _channel;
+  final AutoScrollController _scrollController = AutoScrollController();
 
   @override
   void initState() {
     super.initState();
+    _user = types.User(id: widget.userToken == 'admin' ? 'admin-id' : '82091008-a484-4a89-ae75-a22bf8d6f3ac');
     _loadMessages();
+    _connectWebSocket();
+  }
+
+  void _connectWebSocket() {
+    final token = widget.userToken;
+    final url = 'wss://pilltrackr.cathena.io/ws/?token=$token';
+
+    try {
+      _channel = IOWebSocketChannel.connect(Uri.parse(url));
+
+      _channel.stream.listen((message) {
+        final decodedMessage = json.decode(message);
+        print('Received: $decodedMessage');
+        _handleIncomingMessage(decodedMessage);
+      }, onError: (error) {
+        print('WebSocket error: $error');
+        Future.delayed(Duration(seconds: 20), () => _connectWebSocket());
+      }, onDone: () {
+        print('WebSocket closed');
+        Future.delayed(Duration(seconds: 10), () => _connectWebSocket());
+      });
+    } catch (e) {
+      print('WebSocketChannelException: $e');
+    }
+  }
+
+  void _handleIncomingMessage(Map<String, dynamic> message) {
+    final messageData = message['message'];
+    if (messageData['RequestID'] == widget.requestId) {
+      final isSentByUser = messageData['SentByUser'] ?? false;
+      final author = types.User(id: isSentByUser ? _user.id : 'admin-id');
+
+      final newMessage = types.TextMessage(
+        author: author,
+        createdAt: DateTime.parse(messageData['CreatedAt']).millisecondsSinceEpoch,
+        id: messageData['ID'].toString(),
+        text: messageData['Content'],
+      );
+
+      _addMessage(newMessage);
+    }
   }
 
   void _addMessage(types.Message message) {
     setState(() {
       _messages.insert(0, message);
-    });
-  }
-
-  void _handleAttachmentPressed() {
-    showModalBottomSheet<void>(
-      context: context,
-      builder: (BuildContext context) => SafeArea(
-        child: SizedBox(
-          height: 144,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _handleImageSelection();
-                },
-                child: const Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Text('Photo'),
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _handleFileSelection();
-                },
-                child: const Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Text('File'),
-                ),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Text('Cancel'),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _handleFileSelection() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.any,
-    );
-
-    if (result != null && result.files.single.path != null) {
-      final message = types.FileMessage(
-        author: _user,
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-        id: const Uuid().v4(),
-        mimeType: lookupMimeType(result.files.single.path!),
-        name: result.files.single.name,
-        size: result.files.single.size,
-        uri: result.files.single.path!,
-      );
-
-      _addMessage(message);
-    }
-  }
-
-  void _handleImageSelection() async {
-    final result = await ImagePicker().pickImage(
-      imageQuality: 70,
-      maxWidth: 1440,
-      source: ImageSource.gallery,
-    );
-
-    if (result != null) {
-      final bytes = await result.readAsBytes();
-      final image = await decodeImageFromList(bytes);
-
-      final message = types.ImageMessage(
-        author: _user,
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-        height: image.height.toDouble(),
-        id: const Uuid().v4(),
-        name: result.name,
-        size: bytes.length,
-        uri: result.path,
-        width: image.width.toDouble(),
-      );
-
-      _addMessage(message);
-    }
-  }
-
-  void _handleMessageTap(BuildContext _, types.Message message) async {
-    if (message is types.FileMessage) {
-      var localPath = message.uri;
-
-      if (message.uri.startsWith('http')) {
-        try {
-          final index =
-              _messages.indexWhere((element) => element.id == message.id);
-          final updatedMessage =
-              (_messages[index] as types.FileMessage).copyWith(
-            isLoading: true,
-          );
-
-          setState(() {
-            _messages[index] = updatedMessage;
-          });
-
-          final client = http.Client();
-          final request = await client.get(Uri.parse(message.uri));
-          final bytes = request.bodyBytes;
-          final documentsDir = (await getApplicationDocumentsDirectory()).path;
-          localPath = '$documentsDir/${message.name}';
-
-          if (!File(localPath).existsSync()) {
-            final file = File(localPath);
-            await file.writeAsBytes(bytes);
-          }
-        } finally {
-          final index =
-              _messages.indexWhere((element) => element.id == message.id);
-          final updatedMessage =
-              (_messages[index] as types.FileMessage).copyWith(
-            isLoading: null,
-          );
-
-          setState(() {
-            _messages[index] = updatedMessage;
-          });
-        }
-      }
-
-      await OpenFilex.open(localPath);
-    }
-  }
-
-  void _handlePreviewDataFetched(
-    types.TextMessage message,
-    types.PreviewData previewData,
-  ) {
-    final index = _messages.indexWhere((element) => element.id == message.id);
-    final updatedMessage = (_messages[index] as types.TextMessage).copyWith(
-      previewData: previewData,
-    );
-
-    setState(() {
-      _messages[index] = updatedMessage;
     });
   }
 
@@ -212,30 +91,62 @@ class _ChatPageState extends State<ChatPage> {
     );
 
     _addMessage(textMessage);
+
+    final wsMessage = {
+      "request": widget.requestId,
+      "content": message.text,
+    };
+    _channel.sink.add(json.encode(wsMessage));
   }
 
   void _loadMessages() async {
-    final response = await rootBundle.loadString('assets/messages.json');
-    final messages = (jsonDecode(response) as List)
-        .map((e) => types.Message.fromJson(e as Map<String, dynamic>))
-        .toList();
+    final response = await http.get(
+      Uri.parse('https://pilltrackr.cathena.io/api/request/${widget.requestId}/messages'),
+      headers: {
+        'Authorization': 'Bearer admin',
+      },
+    );
 
-    setState(() {
-      _messages = messages;
-    });
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonMessages = json.decode(response.body);
+      final messages = jsonMessages.map((json) {
+        final isSentByUser = json['SentByUser'] ?? false;
+        final author = types.User(id: isSentByUser ? _user.id : 'admin-id');
+
+        return types.TextMessage(
+          author: author,
+          createdAt: DateTime.parse(json['CreatedAt']).millisecondsSinceEpoch,
+          id: json['ID'].toString(),
+          text: json['Content'],
+        );
+      }).toList();
+
+      setState(() {
+        _messages = messages.reversed.toList();
+      });
+    } else {
+      print('Failed to load messages');
+    }
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Chat'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: _loadMessages,
+            ),
+          ],
+        ),
         body: Chat(
           messages: _messages,
-          onAttachmentPressed: _handleAttachmentPressed,
-          onMessageTap: _handleMessageTap,
-          onPreviewDataFetched: _handlePreviewDataFetched,
           onSendPressed: _handleSendPressed,
           showUserAvatars: true,
           showUserNames: true,
           user: _user,
+          scrollController: _scrollController,
         ),
       );
 }

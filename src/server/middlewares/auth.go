@@ -66,10 +66,7 @@ func AssertUserExistance(pg *gorm.DB) gin.HandlerFunc {
 
 		fmt.Println("-> [AssertUserExistanceMiddleware] Usuário existe. ("+contextId+")")
 
-		// Verifica se o usuário é um administrador
-		// TODO: o internalID d033e2 carresponde ao header "Authorization: admin", para que possamos testar a funcionalidade de administrador
-		// Remover isso em produção
-		if user.IsAdmin || user.InternalId == "d033e2" {
+		if user.IsAdmin {
 			fmt.Println("-> [AssertUserExistanceMiddleware] Usuário é um administrador.")
 			c.Set("is_admin", true)
 		}

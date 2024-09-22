@@ -24,24 +24,6 @@ func InitAdminRoutes(r *gin.Engine, clients types.Clients) {
 			c.JSON(200, "Hello, Admin!")
 		})
 
-		admin.POST("/createProduct", mw.IsAdmin(), func(c *gin.Context) {
-			var req createProductBody
-			if err := c.BindJSON(&req); err != nil {
-				c.JSON(400, gin.H{"error": err.Error()})
-				return
-			}
-
-			res, err := services.CreateProduct(clients, req.Name, req.Code)
-
-			if err != nil {
-				c.JSON(500, gin.H{"error": err.Error()})
-				return
-			}
-
-			c.JSON(200, gin.H{"message": res})
-
-		})
-
 		admin.POST("/makeAdmin", mw.IsAdmin(), func(c *gin.Context) {
 
 			var req makeAdminBody

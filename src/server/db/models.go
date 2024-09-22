@@ -12,9 +12,7 @@ import (
 type User struct {
 	gorm.Model
 	InternalId string `gorm:"unique;not null"`
-	Position   string
 	Name       string
-	Email      string
 	Requests   []Request
 	Messages   []Message
 	IsAdmin    bool `gorm:"default:false"` // true se o usuário é da central, false se é um usuário comum
@@ -24,27 +22,30 @@ type User struct {
 type Request struct {
 	gorm.Model
 	UserId      uint
+	User        User
 	Description string
-	Closed      bool `gorm:"default:false"`
+	Status      Status `gorm:"default:1"`
 	IsUrgent    bool `gorm:"default:false"`
 	Messages    []Message
-	// Reports     []Report  `gorm:"many2many:request_reports;"`
+	PyxisID     uint
+	Pyxis       Pyxis
 	Products []Product `gorm:"many2many:request_products;"`
-	// PixiesId    uint
-	// Pixies      Pixies
 }
+
+type Status int
+
+const (
+	Waiting Status = iota + 1
+	InProgress
+	Finished
+)
 
 // Produto (Equipamentos, insumos, remédios, etc.)
 type Product struct {
 	gorm.Model
 	Name string `gorm:"not null"`
-	Code string `gorm:"unique;not null"` // Código do item (código de barras?)
+	Code int `gorm:"unique;not null"` // Código do item (código de barras?)
 }
-
-// type Report struct {
-// 	gorm.Model
-// 	Name string `gorm:"not null"`
-// }
 
 // Mensagem
 type Message struct {
@@ -57,13 +58,10 @@ type Message struct {
 	User       User
 }
 
-// Máquinas Pixies
-// type Pixies struct {
-// 	gorm.Model
-// 	Name     string `gorm:"not null"`
-// 	Floor    int
-// 	Products []Product `gorm:"many2many:pixies_products;"`
-// }
+type Pyxis struct {
+	gorm.Model
+	Name     string `gorm:"not null"`
+}
 
 func (u *User) AfterSave(tx *gorm.DB) (err error) {
 	ginmetrics.GetMonitor().GetMetric("db_users_operations_total").Inc([]string{"label1"})

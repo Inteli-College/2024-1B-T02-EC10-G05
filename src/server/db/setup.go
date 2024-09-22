@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+
+	"github.com/gin-gonic/gin"
+	"github.com/penglongli/gin-metrics/ginmetrics"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -72,4 +75,26 @@ func SetupRedis( ) *redis.Client {
 		os.Exit(1)
 	}
 	return redisClient
+}
+
+func SetupPrometheus(r *gin.Engine) {
+	m := ginmetrics.GetMonitor()
+	
+	m.AddMetric(&ginmetrics.Metric{
+		Type: 	ginmetrics.Counter,
+		Name: "db_requests_operations_total",
+		Description: "Total number of db requests operations",
+		Labels:      []string{"label1"},
+	})
+
+	m.AddMetric(&ginmetrics.Metric{
+		Type: 	ginmetrics.Counter,
+		Name: "db_users_operations_total",
+		Description: "Total number of db user operations",
+		Labels:      []string{"label1"},
+	})
+
+	m.SetMetricPath("/metrics")
+	m.Use(r)
+
 }

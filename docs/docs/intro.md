@@ -14,7 +14,7 @@ A primeira sprint do projeto foi dedicada ao entendimento inicial da proposta ap
 
 
 <iframe loading="lazy"
-    style={{ display: 'block', margin: 'auto', width: '100%', height: '55.7vh' }}
+    style={{ display: 'block', margin: 'auto', width: '100%', height: '66vh' }}
     src="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAGDfBce7es&#x2F;pu4VF2frkxWTK35Y4SfuXw&#x2F;view?embed">
 </iframe>
 
@@ -26,6 +26,42 @@ Posteriormente à validação inicial do entendimento do problema e da solução
 
 
 <iframe loading="lazy"
-    style={{ display: 'block', margin: 'auto', width: '100%', height: '55.7vh' }}
+    style={{ display: 'block', margin: 'auto', width: '100%', height: '66vh' }}
     src="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAGEyqM2EJU&#x2F;yGp7tzc9UBFRYnYinvq3YA&#x2F;view?embed" >
+</iframe>
+
+## Sprint III
+
+A terceira sprint do projeto foi marcada pela sofisticação da arquitetura elaborada pelo grupo, pelo desenvolvimento dos componentes do back-end de forma mais robusta e pelo desenvolvimento das telas do front-end da aplicação mobile. A Sprint Review foi dedicada à demonstração inicial do aplicativo para o cliente, de modo que fosse possível criar uma percepção inicial do que será o produto a ser entregue ao final do projeto. Por fim, foram implementados testes capazes de assegurar a usabilidade da aplicação.
+
+[Link da Apresentação](https://www.canva.com/design/DAGGIzoHc5o/emYyC4Xi6pnOPGBqPHyJsA/view?utm_content=DAGGIzoHc5o&utm_campaign=designshare&utm_medium=link&utm_source=editor)
+
+
+<iframe loading="lazy"
+    style={{ display: 'block', margin: 'auto', width: '100%', height: '66vh' }}
+    src="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAGGIzoHc5o&#x2F;e65_FLzJcXImWvf9JSRziA&#x2F;view?embed" >
+</iframe>
+
+## Sprint IV
+
+Ao longo da quarta sprint, a equipe de desenvolvimento se dedicou à integração entre a interface e os componentes do back-end da aplicação. Além disso, foram implementadas novas funcionalidades na aplicação e foi realizado o deploy do projeto em nuvem. O sistema passou a contar, também, com um sistema de monitoramento e recuperação de falhas.
+
+[Link da Apresentação](https://www.canva.com/design/DAGHc_godcc/zXLHMDqkGDliqOUzB9BpKw/view?utm_content=DAGHc_godcc&utm_campaign=designshare&utm_medium=link&utm_source=editor)
+
+
+<iframe loading="lazy"
+    style={{ display: 'block', margin: 'auto', width: '100%', height: '66vh' }}
+    src="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAGHc_godcc&#x2F;e-QOWBVCs2wsGxS6eNUudg&#x2F;view?embed" >
+</iframe>
+
+## Sprint V
+
+A quinta sprint foi focada na finalização da solução, incluindo a implementação de ajustes finais, testes extensivos e a documentação detalhada do projeto. A equipe também desenvolveu um plano de comunicação para garantir que os colaboradores do Hospital Sírio-Libanês sejam devidamente informados e treinados sobre o uso da nova plataforma. A apresentação da Sprint V incluiu uma visão geral das funcionalidades implementadas, os testes realizados e os próximos passos para a implementação completa da solução.
+
+[Link da Apresentação](https://www.canva.com/design/DAGIrMo65sY/gBCPR4XDCUTEWM-oaxiMmw/edit?utm_content=DAGIrMo65sY&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+
+
+<iframe loading="lazy"
+    style={{ display: 'block', margin: 'auto', width: '100%', height: '66vh' }}
+    src="https://www.canva.com/design/DAGIrMo65sY/gBCPR4XDCUTEWM-oaxiMmw/view?embed" >
 </iframe>

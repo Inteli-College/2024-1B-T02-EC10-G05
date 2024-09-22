@@ -5,21 +5,16 @@ import (
 	mw "g5/server/middlewares"
 	"g5/server/services"
 	"g5/server/types"
-	"github.com/go-playground/validator/v10"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
-type createProductRequestBody struct {
-	ProductCodes []string `json:"productCodes" validate:"required"`
-	Urgent       bool     `json:"urgent"`
-	Description  string   `json:"description"`
-	// PixiesID     uint     `json:"pixiesID"`
+type createRequestBody struct {
+	ProductCodes    []uint `json:"productCodes"`
+	Urgent      bool   `json:"urgent"`
+	Description string `json:"description"`
+	PyxisID    uint   `json:"pyxisID" validate:"required"`
 }
-
-// type findPixiesRequestBody struct {
-// 	ProductCode   string `json:"productCode"`
-// 	CurrentPixies string `json:"currentPixies"`
-// }
 
 func InitRequestRoutes(r *gin.Engine, clients types.Clients) {
 
@@ -27,10 +22,10 @@ func InitRequestRoutes(r *gin.Engine, clients types.Clients) {
 	{
 
 		requests.POST("/create", func(c *gin.Context) {
+			
+			user, _ := c.Get("user_internal_id")
 
-			fmt.Println(c.Get("user_id"))
-
-			var req createProductRequestBody
+			var req createRequestBody
 
 			if err := c.BindJSON(&req); err != nil {
 				c.JSON(400, gin.H{"error": err.Error()})
@@ -49,10 +44,11 @@ func InitRequestRoutes(r *gin.Engine, clients types.Clients) {
 			services.CreateRequest(
 				c,
 				clients,
+				user.(string),
 				req.ProductCodes,
-				req.Urgent || false,
+				req.Urgent,
 				req.Description,
-				// req.PixiesID,
+				req.PyxisID,
 			)
 
 		})
@@ -87,6 +83,6 @@ func InitRequestRoutes(r *gin.Engine, clients types.Clients) {
 
 		// 	services.FindNearestPixies(c, clients, req.ProductCode, req.CurrentPixies)
 		// })
-	
+
 	}
 }
